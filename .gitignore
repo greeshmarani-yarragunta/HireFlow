@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+
+# Media uploads (keep directory structure with .gitkeep)
+backend/media/resumes/*
+!backend/media/resumes/.gitkeep
+!backend/media/resumes/sample_resume_greeshma.docx
+!backend/media/resumes/user_4_78c769f2.docx
+backend/media/company_logos/*
+!backend/media/company_logos/.gitkeep
+backend/media/profiles/*
+!backend/media/profiles/.gitkeep
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+build/
+frontend/build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache & Testing
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.eslintcache
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Verification and temporary artifacts
+*.webp
+*.tmp
+temp/
+tmp/
