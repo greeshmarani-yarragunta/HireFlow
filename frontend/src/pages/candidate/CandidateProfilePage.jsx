@@ -65,12 +65,12 @@ const CandidateProfilePage = () => {
     setErrorMsg('');
 
     try {
-      // 1. Update basic user fields
-      await authService.updateCurrentUser(personal);
+      // 1 & 2. Run user info and candidate profile updates in parallel
+      const [, updatedProfile] = await Promise.all([
+        authService.updateCurrentUser(personal),
+        authService.updateCandidateProfile(profile),
+      ]);
       updateUser(personal);
-
-      // 2. Update candidate profile fields
-      const updatedProfile = await authService.updateCandidateProfile(profile);
       setProfile({
         location: updatedProfile.location || '',
         bio: updatedProfile.bio || '',

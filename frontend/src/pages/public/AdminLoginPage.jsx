@@ -35,12 +35,6 @@ const AdminLoginPage = () => {
     }
   };
 
-  const handleDemoFill = () => {
-    setEmail('admin@hireflow.com');
-    setPassword('Admin@123');
-    setError('');
-  };
-
   return (
     <div style={{ padding: '4rem 1.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 140px)' }}>
       <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.5rem', borderTop: '4px solid var(--danger)' }}>
@@ -113,16 +107,6 @@ const AdminLoginPage = () => {
             {loading ? 'Authenticating...' : 'Sign In as Administrator'}
           </button>
         </form>
-
-        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-          <button
-            type="button"
-            className="btn btn-outline btn-block btn-sm"
-            onClick={handleDemoFill}
-          >
-            ⚡ Auto-Fill Demo Admin
-          </button>
-        </div>
       </div>
     </div>
   );

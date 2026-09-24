@@ -1,6 +1,11 @@
 import api from './api';
 
 export const jobService = {
+  async getPlatformStats() {
+    const response = await api.get('/platform-stats/');
+    return response.data;
+  },
+
   async getPublicJobs(params = {}) {
     const response = await api.get('/jobs/', { params });
     return response.data;

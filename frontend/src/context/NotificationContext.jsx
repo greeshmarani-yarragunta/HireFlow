@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import notificationService from '../services/notificationService';
 import { useAuth } from './AuthContext';
 
@@ -23,12 +23,15 @@ export const NotificationProvider = ({ children }) => {
     if (!isAuthenticated) return;
     try {
       const data = await notificationService.getNotifications();
-      setNotifications(data.results || data);
-      await fetchUnreadCount();
+      const list = data.results || data;
+      setNotifications(list);
+      // Derive unread count from fetched notifications list without redundant round-trip API call
+      const unread = list.filter((n) => !n.is_read).length;
+      setUnreadCount(unread);
     } catch {
       // Ignore
     }
-  }, [isAuthenticated, fetchUnreadCount]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -63,17 +66,20 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const value = useMemo(
+    () => ({
+      notifications,
+      unreadCount,
+      fetchNotifications,
+      fetchUnreadCount,
+      markAsRead,
+      markAllAsRead,
+    }),
+    [notifications, unreadCount, fetchNotifications, fetchUnreadCount]
+  );
+
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        unreadCount,
-        fetchNotifications,
-        fetchUnreadCount,
-        markAsRead,
-        markAllAsRead,
-      }}
-    >
+    <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
   );

@@ -61,9 +61,6 @@ api.interceptors.response.use(
           .catch((err) => Promise.reject(err));
       }
 
-      originalRequest._retry = true;
-      isRefreshing = true;
-
       const refreshToken = localStorage.getItem('hireflow_refresh_token');
 
       if (!refreshToken) {
@@ -74,6 +71,9 @@ api.interceptors.response.use(
 
         return Promise.reject(error);
       }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         const refreshResponse = await axios.post(

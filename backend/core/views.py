@@ -206,3 +206,23 @@ class AdminDashboardView(APIView):
             'pending_jobs': pending_jobs_data,
             'recent_applications': recent_apps_data,
         })
+
+
+class PlatformStatsView(APIView):
+    """
+    Public read-only endpoint returning real aggregate platform statistics.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        active_openings = Job.objects.filter(status=Job.Status.ACTIVE).count()
+        candidates = User.objects.filter(role=User.Role.CANDIDATE).count()
+        applications = Application.objects.count()
+        companies = User.objects.filter(role=User.Role.RECRUITER).count()
+
+        return Response({
+            'active_openings': active_openings,
+            'candidates': candidates,
+            'applications': applications,
+            'companies': companies,
+        })

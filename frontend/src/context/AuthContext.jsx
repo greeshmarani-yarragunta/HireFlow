@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import authService from '../services/authService';
 
 const AuthContext = createContext(null);
@@ -70,23 +70,26 @@ export const AuthProvider = ({ children }) => {
   const isRecruiter = user?.role === 'RECRUITER';
   const isAdmin = user?.role === 'ADMIN';
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      loading,
+      isAuthenticated: !!user,
+      role: user?.role || null,
+      isCandidate,
+      isRecruiter,
+      isAdmin,
+      login,
+      registerCandidate,
+      registerRecruiter,
+      logout,
+      updateUser,
+    }),
+    [user, loading, isCandidate, isRecruiter, isAdmin]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        isAuthenticated: !!user,
-        role: user?.role || null,
-        isCandidate,
-        isRecruiter,
-        isAdmin,
-        login,
-        registerCandidate,
-        registerRecruiter,
-        logout,
-        updateUser,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

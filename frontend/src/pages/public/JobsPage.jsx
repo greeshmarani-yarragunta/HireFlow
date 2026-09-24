@@ -86,23 +86,44 @@ const JobsPage = () => {
     setPage(1);
   };
 
+  const [savingJobIds, setSavingJobIds] = useState(new Set());
+
   const handleSaveToggle = async (jobId) => {
-    if (!isCandidate) return;
+    if (!isCandidate || savingJobIds.has(jobId)) return;
     const isCurrentlySaved = savedJobIds.has(jobId);
+
+    // Prevent duplicate in-flight requests
+    setSavingJobIds((prev) => new Set(prev).add(jobId));
+
+    // Optimistic UI update for immediate response
+    setSavedJobIds((prev) => {
+      const next = new Set(prev);
+      if (isCurrentlySaved) next.delete(jobId);
+      else next.add(jobId);
+      return next;
+    });
+
     try {
       if (isCurrentlySaved) {
         await jobService.unsaveJob(jobId);
-        setSavedJobIds((prev) => {
-          const next = new Set(prev);
-          next.delete(jobId);
-          return next;
-        });
       } else {
         await jobService.saveJob(jobId);
-        setSavedJobIds((prev) => new Set(prev).add(jobId));
       }
     } catch (err) {
       console.error('Error toggling save job:', err);
+      // Revert optimistic update on failure
+      setSavedJobIds((prev) => {
+        const next = new Set(prev);
+        if (isCurrentlySaved) next.add(jobId);
+        else next.delete(jobId);
+        return next;
+      });
+    } finally {
+      setSavingJobIds((prev) => {
+        const next = new Set(prev);
+        next.delete(jobId);
+        return next;
+      });
     }
   };
 

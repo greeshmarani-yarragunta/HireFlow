@@ -55,18 +55,24 @@ const JobDetailsPage = () => {
     fetchJob();
   }, [id]);
 
+  const [saveLoading, setSaveLoading] = useState(false);
+
   const handleSaveToggle = async () => {
-    if (!isCandidate) return;
+    if (!isCandidate || saveLoading) return;
+    setSaveLoading(true);
+    const prevSaved = isSaved;
+    setIsSaved(!prevSaved); // Optimistic UI update
     try {
-      if (isSaved) {
+      if (prevSaved) {
         await jobService.unsaveJob(id);
-        setIsSaved(false);
       } else {
         await jobService.saveJob(id);
-        setIsSaved(true);
       }
     } catch (err) {
       console.error('Save toggle error:', err);
+      setIsSaved(prevSaved); // Revert on failure
+    } finally {
+      setSaveLoading(false);
     }
   };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import jobService from '../../services/jobService';
 import JobCard from '../../components/jobs/JobCard';
 import SearchBar from '../../components/jobs/SearchBar';
@@ -18,7 +17,8 @@ import {
 const LandingPage = () => {
   const [featuredJobs, setFeaturedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { login } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,7 +32,21 @@ const LandingPage = () => {
         setLoading(false);
       }
     };
+
+    const fetchStats = async () => {
+      try {
+        const data = await jobService.getPlatformStats();
+        setStats(data);
+      } catch (err) {
+        console.error('Failed to load platform stats:', err);
+        setStats(null);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
     fetchJobs();
+    fetchStats();
   }, []);
 
   const handleSearch = ({ search, location }) => {
@@ -42,13 +56,10 @@ const LandingPage = () => {
     navigate(`/jobs?${params.toString()}`);
   };
 
-  const handleQuickDemoLogin = async (email, password, redirectPath) => {
-    try {
-      await login(email, password);
-      navigate(redirectPath);
-    } catch (err) {
-      console.error('Demo login error:', err);
-    }
+  const renderStatValue = (val) => {
+    if (statsLoading) return '—';
+    if (val !== undefined && val !== null) return val.toLocaleString();
+    return '—';
   };
 
   return (
@@ -125,54 +136,29 @@ const LandingPage = () => {
             }}
           >
             <div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#60a5fa' }}>500+</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#60a5fa' }}>
+                {renderStatValue(stats?.active_openings)}
+              </div>
               <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Active Openings</div>
             </div>
             <div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>1,200+</div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Verified Candidates</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#34d399' }}>
+                {renderStatValue(stats?.candidates)}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Candidates</div>
             </div>
             <div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#c084fc' }}>94%</div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Skill Match Accuracy</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#c084fc' }}>
+                {renderStatValue(stats?.applications)}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Applications</div>
             </div>
             <div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fbbf24' }}>100%</div>
-              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Automated Workflow</div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fbbf24' }}>
+                {renderStatValue(stats?.companies)}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Companies</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Demo Access Bar */}
-      <section style={{ backgroundColor: 'var(--bg-subtle)', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border)' }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="badge badge-blue">Quick Demo Access</span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-main)' }}>
-              Explore HireFlow with pre-configured accounts:
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-            <button
-              className="btn btn-outline btn-sm"
-              onClick={() => handleQuickDemoLogin('candidate@hireflow.com', 'Candidate@123', '/candidate/dashboard')}
-            >
-              👤 Candidate Demo
-            </button>
-            <button
-              className="btn btn-outline btn-sm"
-              onClick={() => handleQuickDemoLogin('recruiter@techcorp.com', 'Recruiter@123', '/recruiter/dashboard')}
-            >
-              🏢 Recruiter Demo
-            </button>
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => handleQuickDemoLogin('admin@hireflow.com', 'Admin@123', '/admin/dashboard')}
-            >
-              ⚡ Admin Demo
-            </button>
           </div>
         </div>
       </section>
