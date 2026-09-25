@@ -17,20 +17,35 @@ import { formatDateTime } from '../../utils/helpers';
 const Navbar = () => {
   const { user, isAuthenticated, isCandidate, isRecruiter, isAdmin, logout } = useAuth();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+
   const notificationRef = useRef(null);
+  const profileRef = useRef(null);
+
   const navigate = useNavigate();
 
+  // Close notification/profile dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+      if (
+        notificationRef.current &&
+        !notificationRef.current.contains(event.target)
+      ) {
         setNotificationsOpen(false);
+      }
+
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        setProfileMenuOpen(false);
       }
     };
 
-    if (notificationsOpen) {
+    if (notificationsOpen || profileMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('touchstart', handleClickOutside);
     }
@@ -39,7 +54,7 @@ const Navbar = () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, [notificationsOpen]);
+  }, [notificationsOpen, profileMenuOpen]);
 
   const handleLogout = () => {
     logout();
@@ -56,8 +71,13 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="container navbar-content">
+
         {/* Brand */}
-        <Link to="/" className="navbar-brand" onClick={() => setMobileMenuOpen(false)}>
+        <Link
+          to="/"
+          className="navbar-brand"
+          onClick={() => setMobileMenuOpen(false)}
+        >
           <div className="brand-badge">
             <FiBriefcase size={20} />
           </div>
@@ -71,6 +91,7 @@ const Navbar = () => {
               Find Jobs
             </Link>
           </li>
+
           <li>
             <Link to="/how-it-works" className="nav-link">
               How It Works
@@ -79,7 +100,11 @@ const Navbar = () => {
 
           {isAuthenticated && (
             <li>
-              <Link to={getDashboardPath()} className="nav-link" style={{ fontWeight: 600 }}>
+              <Link
+                to={getDashboardPath()}
+                className="nav-link"
+                style={{ fontWeight: 600 }}
+              >
                 Dashboard
               </Link>
             </li>
@@ -91,7 +116,10 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               {/* Notification Bell */}
-              <div ref={notificationRef} style={{ position: 'relative' }}>
+              <div
+                ref={notificationRef}
+                style={{ position: 'relative' }}
+              >
                 <button
                   className="btn-outline"
                   style={{
@@ -111,6 +139,7 @@ const Navbar = () => {
                   aria-label="Notifications"
                 >
                   <FiBell size={18} />
+
                   {unreadCount > 0 && (
                     <span
                       style={{
@@ -162,7 +191,15 @@ const Navbar = () => {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>Notifications</span>
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                        }}
+                      >
+                        Notifications
+                      </span>
+
                       {unreadCount > 0 && (
                         <button
                           onClick={markAllAsRead}
@@ -180,9 +217,22 @@ const Navbar = () => {
                       )}
                     </div>
 
-                    <div style={{ overflowY: 'auto', flex: 1, maxHeight: '320px' }}>
+                    <div
+                      style={{
+                        overflowY: 'auto',
+                        flex: 1,
+                        maxHeight: '320px',
+                      }}
+                    >
                       {notifications.length === 0 ? (
-                        <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                        <div
+                          style={{
+                            padding: '2rem 1rem',
+                            textAlign: 'center',
+                            color: 'var(--text-muted)',
+                            fontSize: '0.85rem',
+                          }}
+                        >
                           No notifications yet
                         </div>
                       ) : (
@@ -192,22 +242,62 @@ const Navbar = () => {
                             style={{
                               padding: '0.75rem 1rem',
                               borderBottom: '1px solid var(--border)',
-                              backgroundColor: notif.is_read ? 'transparent' : 'var(--primary-light)',
+                              backgroundColor: notif.is_read
+                                ? 'transparent'
+                                : 'var(--primary-light)',
                               cursor: 'pointer',
                               transition: 'background var(--transition-fast)',
                             }}
                             onClick={() => markAsRead(notif.id)}
                           >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                              <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>{notif.title}</strong>
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'flex-start',
+                              }}
+                            >
+                              <strong
+                                style={{
+                                  fontSize: '0.85rem',
+                                  color: 'var(--text-main)',
+                                }}
+                              >
+                                {notif.title}
+                              </strong>
+
                               {!notif.is_read && (
-                                <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary)', marginTop: '4px' }} />
+                                <span
+                                  style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    backgroundColor: 'var(--primary)',
+                                    marginTop: '4px',
+                                  }}
+                                />
                               )}
                             </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem', lineHeight: 1.4 }}>
+
+                            <p
+                              style={{
+                                fontSize: '0.8rem',
+                                color: 'var(--text-muted)',
+                                marginTop: '0.2rem',
+                                lineHeight: 1.4,
+                              }}
+                            >
                               {notif.message}
                             </p>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-light)', marginTop: '0.3rem', display: 'block' }}>
+
+                            <span
+                              style={{
+                                fontSize: '0.7rem',
+                                color: 'var(--text-light)',
+                                marginTop: '0.3rem',
+                                display: 'block',
+                              }}
+                            >
                               {formatDateTime(notif.created_at)}
                             </span>
                           </div>
@@ -219,10 +309,16 @@ const Navbar = () => {
               </div>
 
               {/* User Profile Menu */}
-              <div style={{ position: 'relative' }}>
+              <div
+                ref={profileRef}
+                style={{ position: 'relative' }}
+              >
                 <button
                   className="btn btn-outline btn-sm"
-                  style={{ gap: '0.6rem', padding: '0.4rem 0.8rem' }}
+                  style={{
+                    gap: '0.6rem',
+                    padding: '0.4rem 0.8rem',
+                  }}
                   onClick={() => {
                     setProfileMenuOpen(!profileMenuOpen);
                     setNotificationsOpen(false);
@@ -244,7 +340,16 @@ const Navbar = () => {
                   >
                     {user?.name ? user.name[0].toUpperCase() : 'U'}
                   </div>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{user?.name?.split(' ')[0]}</span>
+
+                  <span
+                    style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    {user?.name?.split(' ')[0]}
+                  </span>
+
                   <FiChevronDown size={14} />
                 </button>
 
@@ -263,10 +368,41 @@ const Navbar = () => {
                       padding: '0.5rem',
                     }}
                   >
-                    <div style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border)', marginBottom: '0.4rem' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{user?.name}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user?.email}</div>
-                      <span className={`badge ${isAdmin ? 'badge-red' : isRecruiter ? 'badge-purple' : 'badge-blue'}`} style={{ marginTop: '0.4rem' }}>
+                    <div
+                      style={{
+                        padding: '0.5rem 0.75rem',
+                        borderBottom: '1px solid var(--border)',
+                        marginBottom: '0.4rem',
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontWeight: 700,
+                          fontSize: '0.9rem',
+                          color: 'var(--text-main)',
+                        }}
+                      >
+                        {user?.name}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: '0.75rem',
+                          color: 'var(--text-muted)',
+                        }}
+                      >
+                        {user?.email}
+                      </div>
+
+                      <span
+                        className={`badge ${isAdmin
+                            ? 'badge-red'
+                            : isRecruiter
+                              ? 'badge-purple'
+                              : 'badge-blue'
+                          }`}
+                        style={{ marginTop: '0.4rem' }}
+                      >
                         {user?.role}
                       </span>
                     </div>
@@ -276,11 +412,16 @@ const Navbar = () => {
                         isCandidate
                           ? '/candidate/profile'
                           : isRecruiter
-                          ? '/recruiter/company'
-                          : '/admin/dashboard'
+                            ? '/recruiter/company'
+                            : '/admin/dashboard'
                       }
                       className="nav-link"
-                      style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: '0.85rem',
+                      }}
                       onClick={() => setProfileMenuOpen(false)}
                     >
                       <FiUser size={15} />
@@ -311,11 +452,24 @@ const Navbar = () => {
               </div>
             </>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Link to="/candidate/login" className="btn btn-outline btn-sm">
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}
+            >
+              <Link
+                to="/candidate/login"
+                className="btn btn-outline btn-sm"
+              >
                 Sign In
               </Link>
-              <Link to="/candidate/signup" className="btn btn-primary btn-sm">
+
+              <Link
+                to="/candidate/signup"
+                className="btn btn-primary btn-sm"
+              >
                 Get Started
               </Link>
             </div>
@@ -366,6 +520,7 @@ const Navbar = () => {
           >
             Find Jobs
           </Link>
+
           <Link
             to="/how-it-works"
             className="nav-link"
@@ -385,6 +540,7 @@ const Navbar = () => {
               >
                 My Dashboard
               </Link>
+
               <button
                 className="btn btn-danger btn-block"
                 style={{ marginTop: 'auto' }}
@@ -397,7 +553,14 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div
+              style={{
+                marginTop: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem',
+              }}
+            >
               <Link
                 to="/candidate/login"
                 className="btn btn-outline btn-block"
@@ -405,6 +568,7 @@ const Navbar = () => {
               >
                 Candidate Sign In
               </Link>
+
               <Link
                 to="/recruiter/login"
                 className="btn btn-outline btn-block"
@@ -412,6 +576,7 @@ const Navbar = () => {
               >
                 Recruiter Portal
               </Link>
+
               <Link
                 to="/candidate/signup"
                 className="btn btn-primary btn-block"
