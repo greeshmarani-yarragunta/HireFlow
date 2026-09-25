@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { ProtectedRoute, PublicLayout } from './components/common/ProtectedRoute';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Public Pages
 import LandingPage from './pages/public/LandingPage';
@@ -51,6 +52,7 @@ import AdminSettingsPage from './pages/admin/AdminSettingsPage';
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <NotificationProvider>
           <Routes>
